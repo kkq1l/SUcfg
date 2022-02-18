@@ -24,3 +24,35 @@ print((steam_path[0]))
 import shutil
 path = path+r'\userdata/'+str(ID3)+'/730/local/cfg/config.cfg'
 shutil.copyfile(path,"asd.cfg")
+
+#search path to CS:GO
+import re
+document_text = open(steam_path[0]+r'\steamapps\libraryfolders.vdf', 'r')
+text_string = document_text.read().lower()
+match_pattern = re.findall(r'\b[a-z]{1,15}\b', text_string)
+
+inputAccses=0
+count=0
+pathGame=['']*10
+accsesDisk=0
+
+for word in match_pattern:
+    if (word == 'label'):
+        inputAccses = 0
+        accsesDisk=0
+    elif(inputAccses==1):
+        if(accsesDisk==1):
+            pathGame[count-1]+=str(word)+':/'
+            accsesDisk=0
+        else:
+            pathGame[count - 1] += str(word) + '/'
+    elif (word == 'path'):
+        accsesDisk=1
+        inputAccses = 1
+        count += 1
+
+
+
+
+
+print(pathGame)
