@@ -48,11 +48,23 @@ for word in match_pattern:
 
 print(pathGame)
 
+#search correct path to CS:GO
+import os
+i=0
+while i<10:
+    fileName = pathGame[i] + 'steamapps\common\Counter-Strike Global Offensive/csgo.exe'
+    if (os.path.isfile(fileName) == True):
+        pathIndex=i
+        break
+    i+=1
+
+
+
 #copy u cfg
 try:
     import shutil
     path = path+r'\userdata/'+str(ID3)+'/730/local/cfg/config.cfg'
-    shutil.copyfile(path, "asdss.cfg")
+    shutil.copyfile(path, "MyConfig.cfg")
 except FileNotFoundError:
     print("not found this user")
 
