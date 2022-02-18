@@ -1,5 +1,5 @@
 #converting steam id
-ID64 = 76561198133783003
+ID64 = 76561198191542870
 
 y = int(ID64) - 76561197960265728
 x = y % 2
@@ -19,11 +19,6 @@ aKey = OpenKey(aReg, aKey)
 steam_path = winreg.QueryValueEx(aKey, "SteamPath")
 path=steam_path[0]
 print((steam_path[0]))
-
-#copy u cfg
-import shutil
-path = path+r'\userdata/'+str(ID3)+'/730/local/cfg/config.cfg'
-shutil.copyfile(path,"asd.cfg")
 
 #search path to CS:GO
 import re
@@ -51,8 +46,15 @@ for word in match_pattern:
         inputAccses = 1
         count += 1
 
-
-
-
-
 print(pathGame)
+
+#copy u cfg
+try:
+    import shutil
+    path = path+r'\userdata/'+str(ID3)+'/730/local/cfg/config.cfg'
+    shutil.copyfile(path, "asdss.cfg")
+except FileNotFoundError:
+    print("not found this user")
+
+
+
