@@ -1,0 +1,1 @@
+venv\Scripts\pyuic5.exe -x untitled.ui -o untitled.py
