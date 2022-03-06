@@ -6,7 +6,7 @@ from winreg import *
 import re
 import shutil
 import os
-Form, Window = uic.loadUiType("untitled.ui")
+Form, Window = uic.loadUiType("GUI.ui")
 
 def accsesClick():
     try:
@@ -83,6 +83,18 @@ def copyConfig():
                 form.lineEdit.setText("not found this user")
 
 
+def autoSearchUser():
+    #search auth acc in steamApp
+    with open(form.path+"\logs\configstore_log.txt", "r") as file:
+        lines=file.readlines()
+    print(lines[-1])
+    k=1
+    while(True):
+        if "userlocal" in lines[-k]:
+            break
+        else:
+            k=k+1
+
 app = QApplication([])
 window = Window()
 form = Form()
@@ -92,8 +104,5 @@ window.show()
 form.radioButton.setChecked(True)
 form.pushButton.clicked.connect(accsesClick)
 app.exec_()
-
-
-
 
 
