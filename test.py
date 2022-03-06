@@ -61,7 +61,7 @@ def copyConfig():
                 shutil.copyfile(path, "MyConfig.cfg")
                 msgBox("Yah", "All done")
             except FileNotFoundError:
-                msgBox("Error","not found this user")
+                msgBox("Error","not found this user or not found config")
         else:
             try:
                 video = serchPathSteam() + r'\userdata/' + str(files[form.comboBox.currentIndex()]) + '/730/local/cfg/video.txt'
@@ -70,7 +70,7 @@ def copyConfig():
                 shutil.copyfile(config, serchPathSteam() + r'\userdata/' + str(files[form.comboBox_2.currentIndex()]) + '/730/local/cfg/config.cfg')
                 msgBox("Yah","All done")
             except FileNotFoundError:
-                msgBox("Error","not found this user")
+                msgBox("Error","not found this user or not found config")
     else:
         msgBox("Error","u cant copy, choose another account")
 
