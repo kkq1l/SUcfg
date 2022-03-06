@@ -1,10 +1,10 @@
+from urllib import request
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 import winreg
 from winreg import *
 import shutil
 import os
-import requests
 
 Form, Window = uic.loadUiType("GUI.ui")
 def msgBox(x,y):
@@ -39,11 +39,11 @@ def userList():
 
     for i in range(0, len(files)):
         asd = int(files[i]) + 76561197960265728
-        vgm_url = 'https://steamcommunity.com/profiles/'+str(asd)
-        html_text = requests.get(vgm_url).text
-        start = html_text.find('<title>') + 7
-        end = html_text.find('</title>', start)
-        title = html_text[start:end]
+        url = 'https://steamcommunity.com/profiles/' + str(asd)
+        html = request.urlopen(url).read().decode('utf8')
+        start = html.find('<title>') + 7
+        end = html.find('</title>', start)
+        title = html[start:end]
         s1 = (title.replace("Steam Community :: ", ""))
         arrUserName[i] = s1
         form.comboBox.insertItem(i, s1)
