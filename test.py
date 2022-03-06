@@ -4,7 +4,7 @@ import winreg
 from winreg import *
 import shutil
 import os
-from mechanize import Browser
+import requests
 
 Form, Window = uic.loadUiType("GUI.ui")
 def msgBox(x,y):
@@ -39,9 +39,12 @@ def userList():
 
     for i in range(0, len(files)):
         asd = int(files[i]) + 76561197960265728
-        br = Browser()
-        br.open("https://steamcommunity.com/profiles/" + str(asd))
-        s1 = (br.title().find(".//title").text).replace("Steam Community :: ", "")
+        vgm_url = 'https://steamcommunity.com/profiles/'+str(asd)
+        html_text = requests.get(vgm_url).text
+        start = html_text.find('<title>') + 7
+        end = html_text.find('</title>', start)
+        title = html_text[start:end]
+        s1 = (title.replace("Steam Community :: ", ""))
         arrUserName[i] = s1
         form.comboBox.insertItem(i, s1)
         form.comboBox_2.insertItem(i, s1)
