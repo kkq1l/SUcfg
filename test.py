@@ -1,28 +1,23 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QCloseEvent
 import winreg
 from winreg import *
-import re
 import shutil
 import os
+import urllib.request
+from lxml.html import parse
+
 Form, Window = uic.loadUiType("GUI.ui")
+def msgBox(x,y):
+    msg = QMessageBox()
+    msg.setWindowTitle(x)
+    msg.setText(y)
+    msg.setIcon(QMessageBox.Information)
+    msg.setStandardButtons(QMessageBox.Ok)
+    msg.exec_()
 
-def accsesClick():
-    try:
-        int(form.lineEdit.text())
-        copyConfig()
-    except:
-        form.lineEdit.setText('error where u id64?')
 
-
-def copyConfig():
-    # converting steam id
-    ID64 = int(form.lineEdit.text())
-    y = int(ID64) - 76561197960265728
-    x = y % 2
-    ID3 = (((y - x) // 2) * 2) + x
-
+def serchPathSteam():
     # where installing steam
     try:
         aKey = r"SOFTWARE\Valve\Steam"
@@ -30,79 +25,62 @@ def copyConfig():
         aKey = OpenKey(aReg, aKey)
         steam_path = winreg.QueryValueEx(aKey, "SteamPath")
         path = steam_path[0]
+
+        return path
     except FileNotFoundError:
-        form.lineEdit.setText("not found software in U PC")
+        msgBox("Error", "not found software in U PC")
+def userDataID():
+    dirname = serchPathSteam() + '/userdata'
+    files = os.listdir(dirname)
+    return files
 
-    # search path to CS:GO
-    document_text = open(steam_path[0] + r'\steamapps\libraryfolders.vdf', 'r')
-    text_string = document_text.read().lower()
-    match_pattern = re.findall(r'\b[a-z]{1,15}\b', text_string)
-    inputAccses = 0
-    count = 0
-    pathGame = [''] * 10
-    accsesDisk = 0
+def userList():
+    files=userDataID()
+    arrUserName = [0] * len(files)
 
-    for word in match_pattern:
-        if (word == 'label'):
-            inputAccses = 0
-            accsesDisk = 0
-        elif (inputAccses == 1):
-            if (accsesDisk == 1):
-                pathGame[count - 1] += str(word) + ':/'
-                accsesDisk = 0
-            else:
-                pathGame[count - 1] += str(word) + '/'
-        elif (word == 'path'):
-            accsesDisk = 1
-            inputAccses = 1
-            count += 1
+    for i in range(0, len(files)):
+        asd = int(files[i]) + 76561197960265728
+        wp = urllib.request.urlopen("https://steamcommunity.com/profiles/" + str(asd))
+        p = parse(wp)
+        s1 = (p.find(".//title").text).replace("Steam Community :: ", "")
+        arrUserName[i] = s1
+        form.comboBox.insertItem(i, s1)
+        form.comboBox_2.insertItem(i, s1)
+    return files
 
 
-    # search correct path to CS:GO
-    i = 0
-    while i < 10:
-        fileName = pathGame[i] + 'steamapps\common\Counter-Strike Global Offensive/csgo.exe'
-        if (os.path.isfile(fileName) == True):
-            form.pathIndex = i
-            break
-        i += 1
-
+def copyConfig():
     # copy u cfg
-        if (form.radioButton.isChecked() == False):
+    files=userDataID()
+    if(form.comboBox.currentIndex()!=form.comboBox_2.currentIndex()):
+        if (form.radioButton_2.isChecked() == True):
             try:
-                path = path + r'\userdata/' + str(ID3) + '/730/local/cfg/config.cfg'
+                path = serchPathSteam() + r'\userdata/' + str(files[form.comboBox.currentIndex()]) + '/730/local/cfg/config.cfg'
                 shutil.copyfile(path, "MyConfig.cfg")
+                msgBox("Yah", "All done")
             except FileNotFoundError:
-                form.lineEdit.setText("not found this user")
+                msgBox("Error","not found this user")
         else:
             try:
-                path = path + r'\userdata/' + str(ID3) + '/730/local/cfg/config.cfg'
-                shutil.copyfile(path, pathGame[form.pathIndex] + 'steamapps/common/Counter-Strike Global Offensive/csgo/cfg/'+'MyConfig.cfg')
-                form.lineEdit.setText('Done!')
+                video = serchPathSteam() + r'\userdata/' + str(files[form.comboBox.currentIndex()]) + '/730/local/cfg/video.txt'
+                config = serchPathSteam() + r'\userdata/' + str(files[form.comboBox.currentIndex()]) + '/730/local/cfg/config.cfg'
+                shutil.copyfile(video, serchPathSteam() + r'\userdata/' + str(files[form.comboBox_2.currentIndex()]) + '/730/local/cfg/video.txt')
+                shutil.copyfile(config, serchPathSteam() + r'\userdata/' + str(files[form.comboBox_2.currentIndex()]) + '/730/local/cfg/config.cfg')
+                msgBox("Yah","All done")
             except FileNotFoundError:
-                form.lineEdit.setText("not found this user")
+                msgBox("Error","not found this user")
+    else:
+        msgBox("Error","u cant copy, choose another account")
 
-
-def autoSearchUser():
-    #search auth acc in steamApp
-    with open(form.path+"\logs\configstore_log.txt", "r") as file:
-        lines=file.readlines()
-    print(lines[-1])
-    k=1
-    while(True):
-        if "userlocal" in lines[-k]:
-            break
-        else:
-            k=k+1
 
 app = QApplication([])
 window = Window()
 form = Form()
-form.pathIndex=0
 form.setupUi(window)
 window.show()
-form.radioButton.setChecked(True)
-form.pushButton.clicked.connect(accsesClick)
+userList()
+form.radioButton_2.setChecked(True)
+form.pushButton.clicked.connect(copyConfig)
 app.exec_()
 
 
